@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\{Request, Response, JsonResponse};
 use App\Http\Traits\ResponseTrait;
+use App\Models\User;
+use App\Services\AuthService;
 use App\Services\FormValidation\IFormValidation;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,10 +15,14 @@ class AuthController extends Controller
     use ResponseTrait;
 
     private $validateForm;
+    private $authService;
+    private $user;
 
-    public function __construct(IFormValidation $validateForm)
+    public function __construct(IFormValidation $validateForm, User $user, AuthService $authService)
     {        
         $this->validateForm = $validateForm;
+        $this->authService  = $authService;
+        $this->user         = $user;
     }
 
     /**
@@ -24,23 +30,49 @@ class AuthController extends Controller
      * @parameter $request
      * @return \Illuminate\Http\Response
      */
-    public function login(Request $request) {
+    public function register(Request $request) 
+    {
         $formValidation = $this->validateForm->validate($request, 0);
         
         if (!$formValidation['isFormValid']) {
             return $this->sendResponse($formValidation['errors'], Response::HTTP_UNPROCESSABLE_ENTITY, 'Validation Error.');
         }
-        
-        if(!Auth::attempt(['email' => $request->email, 'password' => $request->password])){
-            return $this->sendResponse([], Response::HTTP_UNAUTHORIZED, config("constants.failed.login"));            
-        }
-        
-        $user = Auth::user();
+
+        $requestAll = $request->all();
+        $requestAll['name'] = $request->first_name.' '.$request->last_name;
+        $user = $this->user->create($requestAll);
+
         $data['user']   = $user;
         $data['token']  = $user->createToken('MyApp')->plainTextToken; 
         $data['type']   = 'bearer'; 
 
-        return $this->sendResponse($data, Response::HTTP_OK, config("constants.success.data_fetches_success"));
+        return $this->sendResponse($data, Response::HTTP_CREATED, 'Registration Successful');
+    }
+
+    /**
+     * @Check login crediential to allow user access.
+     * @parameter $request
+     * @return \Illuminate\Http\Response
+     */
+    public function login(Request $request) 
+    {
+        $formValidation = $this->validateForm->validate($request, 0);
+        
+        if (!$formValidation['isFormValid']) {
+            return $this->sendResponse($formValidation['errors'], Response::HTTP_UNPROCESSABLE_ENTITY, 'Validation Error.');
+        }
+
+        try {
+
+            if ($request->account_type == 1) {
+                return $this->authService->emailLogin($request);
+            } else if ($request->account_type == 2) {
+                return $this->authService->googleLogin($request->all());
+            }
+
+        } catch (\Exception $ex) {
+            return $this->sendResponse([], Response::HTTP_UNPROCESSABLE_ENTITY, $ex->getMessage()); 
+        }
     }
 
 

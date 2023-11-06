@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Services\FormValidation\IFormValidation;
 use App\Services\FormValidation\LoginFormService;
+use App\Services\FormValidation\RegistrationFormService;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
@@ -32,7 +33,11 @@ class AppServiceProvider extends ServiceProvider
             
             switch ($controller) {
                 case 'AuthController':
-                    return new LoginFormService();
+                    if ($request->input('first_name')) {
+                        return new RegistrationFormService();
+                    } else {
+                        return new LoginFormService();
+                    }
                 default:
                    return '';
             }

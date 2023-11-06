@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\{ AuthController, UserController };
 
 Route::group(['middleware' => ['baseToken']], function () {
 
+    Route::post('register', [AuthController::class, 'register'])->name('auth.register');
     Route::post('login', [AuthController::class, 'login'])->name('auth.login');
 
     Route::group(['middleware' => ['auth:sanctum']], function() {

@@ -5,24 +5,25 @@ namespace App\Services\FormValidation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class LoginFormService implements IFormValidation
+class RegistrationFormService implements IFormValidation
 {
     
     public function rules(): array
     {
         return [
-            'email'    => 'required',
-            'password' => 'required',
-            'account_type' => 'required',
+            'first_name'    => 'required',
+            'email'         => 'required',
+            'password'      => 'min:6|required_with:confirm_password|same:confirm_password',
+            'confirm_password' => 'min:6'
         ];
     }
 
     public function message(): array
     {
         return [
-            'email.required'    => 'Email address is required',
-            'password.required' => 'Password is required',
-            'account_type.required' => 'Account type is required'
+            'first_name.required'   => 'First name is required',
+            'email.required'        => 'Email address is required',
+            'password.required'     => 'Password is required'
         ];
     }
 
