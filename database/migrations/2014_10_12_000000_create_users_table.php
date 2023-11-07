@@ -24,7 +24,7 @@ return new class extends Migration
             $table->unsignedTinyInteger('status')->comment('1=Active,2=Inactive')->default(2);
             $table->string('photo')->nullable();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->string('password')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

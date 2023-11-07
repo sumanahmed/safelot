@@ -21,6 +21,28 @@ class AuthService {
     }
 
     /**
+     * register
+     */
+    public function register($request) 
+    {
+        try {
+
+            $requestAll = $request->all();
+            $requestAll['name'] = ($request->first_name && $request->last_name) ? $request->first_name.' '.$request->last_name : $request->first_name;
+            $user = $this->user->create($requestAll);
+
+            $data['user']   = $user;
+            $data['token']  = $user->createToken('MyApp')->plainTextToken; 
+            $data['type']   = 'Bearer'; 
+
+            return $this->sendResponse($data, Response::HTTP_CREATED, 'Registration Successful');
+
+        } catch (\Exception $ex) {
+            return $this->sendResponse([], Response::HTTP_UNPROCESSABLE_ENTITY, $ex->getMessage()); 
+        }
+    }
+
+    /**
      * login where type = 1 email
      */
     public function emailLogin($request)
@@ -34,7 +56,7 @@ class AuthService {
             $user = Auth::user();
             $data['user']   = $user;
             $data['token']  = $user->createToken('MyApp')->plainTextToken; 
-            $data['type']   = 'bearer'; 
+            $data['type']   = 'Bearer'; 
     
             return $this->sendResponse($data, Response::HTTP_OK, 'Login Successful'); 
 
@@ -45,26 +67,43 @@ class AuthService {
     }
 
     /**
-     * login where type = 2 google
+     * login where account_type = 2 or 3
      */
-    public function googleLogin($request)
+    public function googleAppleLogin($request)
     {
         try {
 
-            if(!Auth::attempt(['email' => $request->email, 'password' => $request->password])){
+            $existUser = $this->user->where(['account_type' => $request->account_type, 'email' => $request->email])->first();
+
+            if ($existUser) {
+                return $this->loginById($existUser->id);
+            }
+
+            return $this->register($request);
+
+        } catch (\Exception $ex) {
+            return $this->sendResponse([], Response::HTTP_UNPROCESSABLE_ENTITY, $ex->getMessage()); 
+        }
+        
+    }
+
+    public function loginById($userId)
+    {       
+        try {
+
+            if(!Auth::loginUsingId($userId)){
                 return $this->sendResponse([], Response::HTTP_UNAUTHORIZED, config("constants.failed.login"));            
             }
             
             $user = Auth::user();
             $data['user']   = $user;
             $data['token']  = $user->createToken('MyApp')->plainTextToken; 
-            $data['type']   = 'bearer'; 
+            $data['type']   = 'Bearer'; 
     
             return $this->sendResponse($data, Response::HTTP_OK, 'Login Successful'); 
 
         } catch (\Exception $ex) {
             return $this->sendResponse([], Response::HTTP_UNPROCESSABLE_ENTITY, $ex->getMessage()); 
         }
-        
     }
 }

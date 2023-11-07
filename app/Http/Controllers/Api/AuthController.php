@@ -38,15 +38,7 @@ class AuthController extends Controller
             return $this->sendResponse($formValidation['errors'], Response::HTTP_UNPROCESSABLE_ENTITY, 'Validation Error.');
         }
 
-        $requestAll = $request->all();
-        $requestAll['name'] = $request->first_name.' '.$request->last_name;
-        $user = $this->user->create($requestAll);
-
-        $data['user']   = $user;
-        $data['token']  = $user->createToken('MyApp')->plainTextToken; 
-        $data['type']   = 'bearer'; 
-
-        return $this->sendResponse($data, Response::HTTP_CREATED, 'Registration Successful');
+        return $this->authService->register($request);
     }
 
     /**
@@ -64,10 +56,10 @@ class AuthController extends Controller
 
         try {
 
-            if ($request->account_type == 1) {
+            if ($request->account_type == 1) { // when email & password login
                 return $this->authService->emailLogin($request);
-            } else if ($request->account_type == 2) {
-                return $this->authService->googleLogin($request->all());
+            } else { //when google or apple login
+                return $this->authService->googleAppleLogin($request);
             }
 
         } catch (\Exception $ex) {
@@ -88,7 +80,7 @@ class AuthController extends Controller
         $user = Auth::user();
         $data['user']   = $user;
         $data['token']  = $user->createToken('MyApp')->plainTextToken; 
-        $data['type']   = 'bearer'; 
+        $data['type']   = 'Bearer'; 
 
         return $this->sendResponse($data, Response::HTTP_OK, config("constants.success.data_fetches_success"));
     }
