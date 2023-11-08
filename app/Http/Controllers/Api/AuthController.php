@@ -67,6 +67,22 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * @login by ID
+     * @parameter $request
+     * @return \Illuminate\Http\Response
+     */
+    public function loginById(Request $request) 
+    {
+        try {
+
+            return $this->authService->loginById($request->id);
+
+        } catch (\Exception $ex) {
+            return $this->sendResponse([], Response::HTTP_UNPROCESSABLE_ENTITY, $ex->getMessage()); 
+        }
+    }
+
 
     public function logout()
     {  

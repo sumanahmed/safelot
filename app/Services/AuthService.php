@@ -6,7 +6,8 @@ use App\Models\User;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Traits\ResponseTrait;
-use DB;
+use Carbon\Carbon;
+use Mail, DB;
 use Illuminate\Support\Facades\Log;
 
 class AuthService {
@@ -31,11 +32,17 @@ class AuthService {
             $requestAll['name'] = ($request->first_name && $request->last_name) ? $request->first_name.' '.$request->last_name : $request->first_name;
             $user = $this->user->create($requestAll);
 
+            if ($request->type == 3) { //type 3 = consumer
+                return $this->otpGenerateAndSendToEmail($request);
+            }
+
             $data['user']   = $user;
             $data['token']  = $user->createToken('MyApp')->plainTextToken; 
             $data['type']   = 'Bearer'; 
 
+
             return $this->sendResponse($data, Response::HTTP_CREATED, 'Registration Successful');
+
 
         } catch (\Exception $ex) {
             return $this->sendResponse([], Response::HTTP_UNPROCESSABLE_ENTITY, $ex->getMessage()); 
@@ -102,6 +109,33 @@ class AuthService {
     
             return $this->sendResponse($data, Response::HTTP_OK, 'Login Successful'); 
 
+        } catch (\Exception $ex) {
+            return $this->sendResponse([], Response::HTTP_UNPROCESSABLE_ENTITY, $ex->getMessage()); 
+        }
+    }
+
+    /**
+     * OTP generate & send to email address
+     */
+    public function otpGenerateAndSendToEmail($request)
+    {
+        try {
+
+            $otp = mt_rand(1111,9999);
+
+            DB::table('password_resets')->insert([  
+                'email' => $request->email,   
+                'token' => $otp,   
+                'created_at' => Carbon::now()  
+            ]);
+
+            Mail::send('email.forgot-password', ['otp' => $otp], function($message) use($request){
+                $message->to($request->email);
+                $message->subject('Reset Password');
+
+            });  
+
+            return $this->sendResponse([], Response::HTTP_CREATED, 'OTP send to email address successfully'); 
         } catch (\Exception $ex) {
             return $this->sendResponse([], Response::HTTP_UNPROCESSABLE_ENTITY, $ex->getMessage()); 
         }
