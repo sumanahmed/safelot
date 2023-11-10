@@ -24,15 +24,13 @@ class AuthService {
     /**
      * register
      */
-    public function register($request) 
-    {
+    public function afterRegisterOtpSend($request) 
+    {   
         try {
 
-            $requestAll = $request->all();
-            $requestAll['name'] = ($request->first_name && $request->last_name) ? $request->first_name.' '.$request->last_name : $request->first_name;
-            $this->user->create($requestAll);
-
-            return $this->otpGenerateAndSendToEmail($request);    
+            if ($request->account_type == 1) {
+                return $this->otpGenerateAndSendToEmail($request); 
+            }   
 
         } catch (\Exception $ex) {
             return $this->sendResponse([], Response::HTTP_UNPROCESSABLE_ENTITY, $ex->getMessage()); 
@@ -51,6 +49,19 @@ class AuthService {
             }
             
             $user = Auth::user();
+
+            // start of check account verified by OTP
+                if ($user->otp_verified == 2) {
+                    return $this->sendResponse($user, Response::HTTP_UNPROCESSABLE_ENTITY, 'Your account not verifyed by OTP.'); 
+                }
+            // end of check account verified by OTP
+
+            // start of check account active or not
+                if ($user->status == 2) {
+                    return $this->sendResponse($user, Response::HTTP_UNPROCESSABLE_ENTITY, 'Your account not active yet.'); 
+                }
+            // end of check account active or not
+
             $data['user']   = $user;
             $data['token']  = $user->createToken('MyApp')->plainTextToken; 
             $data['type']   = 'Bearer'; 
@@ -76,7 +87,18 @@ class AuthService {
                 return $this->loginById($existUser->id);
             }
 
-            return $this->register($request);
+            $requestAll = $request->all();
+            $requestAll['name'] = ($request->first_name && $request->last_name) ? $request->first_name.' '.$request->last_name : $request->first_name;
+            $requestAll['otp_verified'] = $request->account_type != 1 ? 1 : 2;
+            $requestAll['status']       = 1; //active
+            
+            $user = $this->user->create($requestAll);
+
+            $data['user']   = $user;
+            $data['token']  = $user->createToken('MyApp')->plainTextToken; 
+            $data['type']   = 'Bearer'; 
+    
+            return $this->sendResponse($data, Response::HTTP_OK, 'Login Successful'); 
 
         } catch (\Exception $ex) {
             return $this->sendResponse([], Response::HTTP_UNPROCESSABLE_ENTITY, $ex->getMessage()); 
@@ -121,7 +143,7 @@ class AuthService {
 
             Mail::send('email.otp', ['otp' => $otp], function($message) use($request){
                 $message->to($request->email);
-                $message->subject('Reset Password');
+                $message->subject('OTP Confirmation');
 
             });  
 

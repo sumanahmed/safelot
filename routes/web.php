@@ -32,6 +32,8 @@ Route::middleware('auth')->group(function () {
 
     Route::group(['prefix' => 'users'], function () {
         Route::get('/', [UserController::class, 'index'])->name('users.index');
+        Route::post('/store', [UserController::class, 'store'])->name('users.store');
+        Route::post('/update/{id}', [UserController::class, 'update'])->name('users.update');
         Route::post('/status-change/{id}', [UserController::class, 'statusChange'])->name('users.status_change');
         Route::post('/destroy/{id}', [UserController::class, 'destroy'])->name('users.destroy');
     });

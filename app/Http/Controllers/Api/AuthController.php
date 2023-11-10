@@ -38,7 +38,19 @@ class AuthController extends Controller
             return $this->sendResponse($formValidation['errors'], Response::HTTP_UNPROCESSABLE_ENTITY, 'Validation Error.');
         }
 
-        return $this->authService->register($request);
+        try {
+
+            $requestAll         = $request->all();
+            $requestAll['name'] = ($request->first_name && $request->last_name) ? $request->first_name.' '.$request->last_name : $request->first_name;
+            $requestAll['password'] = bcrypt($request->password);
+
+            $user = $this->user->create($requestAll);
+
+            return $this->authService->afterRegisterOtpSend($user);
+
+        } catch (\Exception $ex) {
+            return $this->sendResponse([], Response::HTTP_UNPROCESSABLE_ENTITY, $ex->getMessage()); 
+        }
     }
 
     /**
