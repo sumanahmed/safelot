@@ -1,0 +1,1 @@
+<h1>SafeLot. Your current OTP : {{ $otp }}</h1>

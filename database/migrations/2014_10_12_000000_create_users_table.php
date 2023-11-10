@@ -22,11 +22,15 @@ return new class extends Migration
             $table->unsignedTinyInteger('account_type')->comment('1=Email,2=Google,3=Apple')->default(1);
             $table->unsignedTinyInteger('type')->comment('1=Admin User,2=Dealer,3=Consumer')->default(1);
             $table->unsignedTinyInteger('status')->comment('1=Active,2=Inactive')->default(2);
+            $table->unsignedTinyInteger('otp_verified')->comment('1=Yes,2=No')->default(2);
             $table->string('photo')->nullable();
+            $table->string('photo_base64')->nullable();
+            $table->unsignedBigInteger('dealer_id')->nullable()->comment('for consumer');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
             $table->rememberToken();
             $table->timestamps();
+            $table->foreign('dealer_id')->on('users')->references('id');
         });
     }
 

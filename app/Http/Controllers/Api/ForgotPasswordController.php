@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Http\Traits\ResponseTrait;
 use App\Services\AuthService;
 use App\Models\User;
-use Mail, DB, Hash;
+use DB;
 
 class ForgotPasswordController extends Controller
 {
@@ -105,7 +105,7 @@ class ForgotPasswordController extends Controller
 
         try {
 
-            $this->user->where('email', $request->email)->update(['password' => Hash::make($request->password)]);
+            $this->user->where('email', $request->email)->update(['password' => bcrypt($request->password)]);
 
             return $this->sendResponse([], Response::HTTP_OK, 'Password changed successfully'); 
         } catch (\Exception $ex) {

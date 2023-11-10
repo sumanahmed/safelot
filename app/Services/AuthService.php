@@ -30,19 +30,9 @@ class AuthService {
 
             $requestAll = $request->all();
             $requestAll['name'] = ($request->first_name && $request->last_name) ? $request->first_name.' '.$request->last_name : $request->first_name;
-            $user = $this->user->create($requestAll);
+            $this->user->create($requestAll);
 
-            if ($request->type == 3) { //type 3 = consumer
-                return $this->otpGenerateAndSendToEmail($request);
-            }
-
-            $data['user']   = $user;
-            $data['token']  = $user->createToken('MyApp')->plainTextToken; 
-            $data['type']   = 'Bearer'; 
-
-
-            return $this->sendResponse($data, Response::HTTP_CREATED, 'Registration Successful');
-
+            return $this->otpGenerateAndSendToEmail($request);    
 
         } catch (\Exception $ex) {
             return $this->sendResponse([], Response::HTTP_UNPROCESSABLE_ENTITY, $ex->getMessage()); 
@@ -129,7 +119,7 @@ class AuthService {
                 'created_at' => Carbon::now()  
             ]);
 
-            Mail::send('email.forgot-password', ['otp' => $otp], function($message) use($request){
+            Mail::send('email.otp', ['otp' => $otp], function($message) use($request){
                 $message->to($request->email);
                 $message->subject('Reset Password');
 

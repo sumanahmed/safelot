@@ -55,8 +55,11 @@
                                             </td>
                                             <td style="vertical-align: middle;text-align: center;">
                                                 @if($item->status == 2)
-                                                    <a href="#" class="btn btn-raised btn-xs btn-warning" data-toggle="modal" id="changeStatus" data-target="#statusModal" data-id="{{ $item->id }}" data-status="1" title="Active"><i class="fas fa-check"></i></a>
+                                                    <a href="#" class="btn btn-raised btn-xs btn-success" data-toggle="modal" id="changeStatus" data-target="#statusModal" data-id="{{ $item->id }}" data-status="1" title="Active"><i class="fas fa-check"></i></a>
+                                                @else
+                                                    <a href="#" class="btn btn-raised btn-xs btn-warning" data-toggle="modal" id="changeStatus" data-target="#statusModal" data-id="{{ $item->id }}" data-status="1" title="Inactive"><i class="fas fa-ban"></i></a>
                                                 @endif
+                                                <a href="#" class="btn btn-raised btn-xs btn-primary" title="View"><i class="fas fa-eye"></i></a>
                                                 <a href="#" class="btn btn-raised btn-xs btn-info" title="Edit"><i class="fas fa-edit"></i></a>
                                                 <a href="#" class="btn btn-raised btn-xs btn-danger" data-toggle="modal" id="deleteRow" data-target="#deleteModal" data-id="{{ $item->id }}" data-status="0" title="Delete"><i class="fas fa-trash"></i></a>
                                             </td>
