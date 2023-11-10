@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\{HomeController, UserController, ProfileController };
 use Illuminate\Support\Facades\{ Route, Artisan };
 
 /*
@@ -14,20 +15,29 @@ use Illuminate\Support\Facades\{ Route, Artisan };
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth.login');
 });
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 Route::middleware('auth')->group(function () {
-    Route::view('about', 'about')->name('about');
 
-    Route::get('users', [\App\Http\Controllers\UserController::class, 'index'])->name('users.index');
+    Route::group(['prefix' => 'forgot-password'], function () {
+        Route::post('/email-verify', [ForgotPasswordController::class, 'emailVerify'])->name('forgot_password.email_verify');
+        Route::post('/otp-verify', [ForgotPasswordController::class, 'otpVerify'])->name('forgot_password.otp_verify');
+        Route::post('/change-password', [ForgotPasswordController::class, 'changePassword'])->name('forgot_password.change_password');
+    });
 
-    Route::get('profile', [\App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
-    Route::put('profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+    Route::group(['prefix' => 'users'], function () {
+        Route::get('/', [UserController::class, 'index'])->name('users.index');
+        Route::post('/status-change/{id}', [UserController::class, 'statusChange'])->name('users.status_change');
+        Route::post('/destroy/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+    });
+
+    Route::get('profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
 });
 
 Route::get('/clear', function () {
@@ -37,7 +47,7 @@ Route::get('/clear', function () {
     Artisan::call('route:clear');
     Artisan::call('view:clear');
     Artisan::call('config:cache');
-    Artisan::call('route:cache');
+    // Artisan::call('route:cache');
     return "All cache is cleared";
 });
 

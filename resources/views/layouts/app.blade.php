@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="_token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Google Font: Source Sans Pro -->
@@ -12,6 +13,7 @@
     <link rel="stylesheet" href="{{ asset('css/fontawesome.min.css') }}">
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ asset('css/adminlte.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/toastr.css') }}">
     @yield('styles')
 </head>
 <body class="hold-transition sidebar-mini">
@@ -99,6 +101,18 @@
 <!-- AdminLTE App -->
 <script src="{{ asset('js/adminlte.min.js') }}" defer></script>
 <script src="{{ asset('js/common.js') }}" defer></script>
+<script src="{{ asset('js/toastr.js') }}" defer></script>
+
+@if(Session::has('error_message'))
+    <script>
+        toastr.error("{{ Session::get('error_message') }}")
+    </script>
+@endif
+@if(Session::has('message'))
+    <script>
+        toastr.success("{{ Session::get('message') }}")
+    </script>
+@endif
 
 @yield('scripts')
 </body>

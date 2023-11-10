@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Validator;
 use App\Http\Traits\ResponseTrait;
 use App\Services\AuthService;
 use App\Models\User;
-use Carbon\Carbon;
 use Mail, DB, Hash;
 
 class ForgotPasswordController extends Controller
