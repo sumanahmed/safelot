@@ -8,4 +8,16 @@ use Illuminate\Database\Eloquent\Model;
 class Vehicle extends Model
 {
     use HasFactory;
+    
+    protected $guarded = ['id','created_at','updated_at'];
+
+    public function dealership()
+    {
+        return $this->belongsTo(Dealership::class);
+    }
+
+    public function devices()
+    {
+        return $this->hasMany(DeviceInfo::class);
+    }
 }

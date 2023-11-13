@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('city_2')->nullable();
             $table->string('state_2')->nullable();
             $table->string('zip_2')->nullable();
+            $table->softDeletes();
             $table->timestamps();
             $table->foreign('user_id')->on('users')->references('id');
         });

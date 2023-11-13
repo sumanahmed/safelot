@@ -2,10 +2,13 @@
 
 namespace App\Providers;
 
-use App\Services\FormValidation\IFormValidation;
-use App\Services\FormValidation\LoginFormService;
-use App\Services\FormValidation\RegistrationFormService;
-use App\Services\FormValidation\UserFormService;
+use App\Services\FormValidation\{ 
+    DealershipFormService,
+    IFormValidation,
+    LoginFormService,
+    RegistrationFormService,
+    UserFormService
+};
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
@@ -41,6 +44,8 @@ class AppServiceProvider extends ServiceProvider
                     }
                 case 'UserController':
                     return new UserFormService();
+                case 'DealershipController':
+                    return new DealershipFormService();
                 default:
                    return '';
             }

@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\{ AuthController, ForgotPasswordController, UserController };
+use App\Http\Controllers\Api\{ AuthController, DealershipController, ForgotPasswordController, UserController };
 
 /*
 |--------------------------------------------------------------------------
@@ -30,10 +30,18 @@ Route::group(['middleware' => ['baseToken']], function () {
     Route::group(['middleware' => ['auth:sanctum']], function() {
         
         // user routes
-        Route::group(['prefix' => 'user'], function () {
+        Route::group(['prefix' => 'users'], function () {
             Route::get('/', [UserController::class, 'index'])->name('user.index');
+            Route::get('/show', [UserController::class, 'show'])->name('user.index');
+            Route::post('/change-password', [UserController::class, 'changePassword'])->name('user.change_password');
         });
 
+        Route::group(['prefix' => 'dealerships'], function () {
+            Route::get('/', [DealershipController::class, 'index'])->name('dealerships.index');
+            Route::post('/store', [DealershipController::class, 'store'])->name('dealerships.store');
+            Route::get('/show', [DealershipController::class, 'show'])->name('dealerships.show');
+            Route::put('/update', [DealershipController::class, 'update'])->name('dealerships.update');
+        });
 
         Route::post('logout', [AuthController::class, 'logout'])->name('auth.logout');
     });

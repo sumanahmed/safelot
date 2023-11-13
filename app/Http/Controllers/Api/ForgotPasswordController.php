@@ -58,7 +58,7 @@ class ForgotPasswordController extends Controller
             'otp'   => 'required',
             'email' => 'required|email|exists:users',
         ]);
-        
+
         if ($validator->fails()) {
             return [
                 'errors' => $validator->errors(),
@@ -74,10 +74,10 @@ class ForgotPasswordController extends Controller
 
         try {
 
-            $data = $this->user->where('email', $request->email)->update(['otp_verified' => 1]);
+            $this->user->where('email', $request->email)->update(['otp_verified' => 1]);
             DB::table('password_resets')->where(['email'=> $request->email])->delete();
 
-            return $this->sendResponse($data, Response::HTTP_OK, 'OTP verified successfully'); 
+            return $this->sendResponse([], Response::HTTP_OK, 'OTP verified successfully'); 
         } catch (\Exception $ex) {
             return $this->sendResponse([], Response::HTTP_UNPROCESSABLE_ENTITY, $ex->getMessage()); 
         }

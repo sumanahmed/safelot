@@ -27,7 +27,7 @@ class AuthService {
     public function afterRegisterOtpSend($request) 
     {   
         try {
-
+Log::info('acc type = '. $request->account_type);
             if ($request->account_type == 1) {
                 return $this->otpGenerateAndSendToEmail($request); 
             }   
@@ -52,13 +52,13 @@ class AuthService {
 
             // start of check account verified by OTP
                 if ($user->otp_verified == 2) {
-                    return $this->sendResponse($user, Response::HTTP_UNPROCESSABLE_ENTITY, 'Your account not verifyed by OTP.'); 
+                    return $this->sendResponse([], Response::HTTP_UNPROCESSABLE_ENTITY, 'Your account not verifyed by OTP.'); 
                 }
             // end of check account verified by OTP
 
             // start of check account active or not
                 if ($user->status == 2) {
-                    return $this->sendResponse($user, Response::HTTP_UNPROCESSABLE_ENTITY, 'Your account not active yet.'); 
+                    return $this->sendResponse([], Response::HTTP_UNPROCESSABLE_ENTITY, 'Your account not active yet.'); 
                 }
             // end of check account active or not
 
@@ -140,7 +140,7 @@ class AuthService {
                 'token' => $otp,   
                 'created_at' => Carbon::now()  
             ]);
-
+Log::info('otp = '. $otp);
             Mail::send('email.otp', ['otp' => $otp], function($message) use($request){
                 $message->to($request->email);
                 $message->subject('OTP Confirmation');

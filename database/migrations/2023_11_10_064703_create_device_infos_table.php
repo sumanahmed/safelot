@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('supplier', 100)->nullable();
             $table->unsignedTinyInteger('status')->comment('1=Lock,2=Unlock')->default(1);
             $table->unsignedBigInteger('vehicle_id');
+            $table->softDeletes();
             $table->timestamps();
             $table->foreign('vehicle_id')->on('vehicles')->references('id');
         });

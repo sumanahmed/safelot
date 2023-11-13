@@ -21,7 +21,9 @@ class UserController extends Controller
     }
 
     /**
-     * show all users
+     * Display a paginated list of users.
+     *
+     * @return \Illuminate\View\View
      */
     public function index()
     {
@@ -31,9 +33,10 @@ class UserController extends Controller
     }
 
     /**
-     * store
-     * @param $request
-     * return response
+     * Store a newly created user.
+     *
+     * @param  Request  $request
+     * @return Response
      */
     public function store(Request $request)
     {
@@ -58,10 +61,11 @@ class UserController extends Controller
     }
 
     /**
-     * store
-     * @param $request
-     * @param int $id
-     * return response
+     * Update the specified user.
+     *
+     * @param  Request  $request
+     * @param  int  $id
+     * @return Response
      */
     public function update(Request $request, $id)
     {
@@ -92,8 +96,10 @@ class UserController extends Controller
     }
 
     /**
-     * status change
-     * @param int $id
+     * Change the status of the specified user.
+     *
+     * @param  int  $id
+     * @return Response
      */
     public function statusChange($id)
     {
