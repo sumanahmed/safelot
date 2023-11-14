@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\{ AuthController, DealershipController, ForgotPasswordController, UserController };
+use App\Http\Controllers\Api\{ AuthController, DealershipController, ForgotPasswordController, UserController, VehicleController};
 
 /*
 |--------------------------------------------------------------------------
@@ -37,11 +37,19 @@ Route::group(['middleware' => ['baseToken']], function () {
         });
 
         Route::group(['prefix' => 'dealerships'], function () {
-            Route::get('/', [DealershipController::class, 'index'])->name('dealerships.index');
-            Route::post('/store', [DealershipController::class, 'store'])->name('dealerships.store');
-            Route::get('/show', [DealershipController::class, 'show'])->name('dealerships.show');
-            Route::put('/update', [DealershipController::class, 'update'])->name('dealerships.update');
-            Route::delete('/destroy', [DealershipController::class, 'destroy'])->name('dealerships.destroy');
+            Route::get('/', [DealershipController::class, 'index'])->name('dealership.index');
+            Route::post('/store', [DealershipController::class, 'store'])->name('dealership.store');
+            Route::get('/show', [DealershipController::class, 'show'])->name('dealership.show');
+            Route::put('/update', [DealershipController::class, 'update'])->name('dealership.update');
+            Route::delete('/destroy', [DealershipController::class, 'destroy'])->name('dealership.destroy');
+        });
+
+        Route::group(['prefix' => 'vehicles'], function () {
+            Route::get('/', [VehicleController::class, 'index'])->name('vehicle.index');
+            Route::post('/store', [VehicleController::class, 'store'])->name('vehicle.store');
+            Route::get('/show', [VehicleController::class, 'show'])->name('vehicle.show');
+            Route::put('/update', [VehicleController::class, 'update'])->name('vehicle.update');
+            Route::delete('/destroy', [VehicleController::class, 'destroy'])->name('vehicle.destroy');
         });
 
         Route::post('logout', [AuthController::class, 'logout'])->name('auth.logout');

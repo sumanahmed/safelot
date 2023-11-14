@@ -7,7 +7,8 @@ use App\Services\FormValidation\{
     IFormValidation,
     LoginFormService,
     RegistrationFormService,
-    UserFormService
+    UserFormService,
+    VehicleFormService
 };
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
@@ -46,6 +47,8 @@ class AppServiceProvider extends ServiceProvider
                     return new UserFormService();
                 case 'DealershipController':
                     return new DealershipFormService();
+                case 'VehicleController':
+                    return new VehicleFormService();
                 default:
                    return '';
             }

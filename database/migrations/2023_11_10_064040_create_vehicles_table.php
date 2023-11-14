@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('year', 100)->nullable();
             $table->string('color', 100)->nullable();
             $table->string('photo')->nullable();
-            $table->string('photo_base64')->nullable();
+            $table->longText('photo_base64')->nullable();
             $table->softDeletes();
             $table->timestamps();
             $table->foreign('user_id')->on('users')->references('id');
