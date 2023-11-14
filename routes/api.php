@@ -41,6 +41,7 @@ Route::group(['middleware' => ['baseToken']], function () {
             Route::post('/store', [DealershipController::class, 'store'])->name('dealerships.store');
             Route::get('/show', [DealershipController::class, 'show'])->name('dealerships.show');
             Route::put('/update', [DealershipController::class, 'update'])->name('dealerships.update');
+            Route::delete('/destroy', [DealershipController::class, 'destroy'])->name('dealerships.destroy');
         });
 
         Route::post('logout', [AuthController::class, 'logout'])->name('auth.logout');

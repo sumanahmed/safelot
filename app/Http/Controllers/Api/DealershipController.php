@@ -94,7 +94,7 @@ class DealershipController extends Controller
         $data = $this->dealership->find($request->id);
 
         if (!$data) {
-            return $this->sendResponse([], Response::HTTP_UNPROCESSABLE_ENTITY, config("constants.failed.data_not_found")); 
+            return $this->sendResponse([], Response::HTTP_NOT_FOUND, config("constants.failed.data_not_found")); 
         }
 
         return $this->sendResponse($data, Response::HTTP_OK, config("constants.success.data_fetches_success"));
@@ -118,7 +118,7 @@ class DealershipController extends Controller
         $dealership = $this->dealership->find($request->id);
 
         if (!$dealership) {
-            return $this->sendResponse([], Response::HTTP_UNPROCESSABLE_ENTITY, config("constants.failed.data_not_found")); 
+            return $this->sendResponse([], Response::HTTP_NOT_FOUND, config("constants.failed.data_not_found")); 
         }
 
         try {
@@ -140,10 +140,26 @@ class DealershipController extends Controller
      * @param  \App\Models\Item  $item
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Item $item)
-    {
-        $item->delete();
-        return response()->json(null, 204);
+    public function destroy(Request $request)
+    {   
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $data = $validator->errors();
+            return $this->sendResponse($data, Response::HTTP_UNPROCESSABLE_ENTITY, 'Validation Error'); 
+        }
+        
+        $data = $this->dealership->find($request->id);
+
+        if (!$data) {
+            return $this->sendResponse([], Response::HTTP_NOT_FOUND, config("constants.failed.data_not_found")); 
+        }
+
+        $data->delete();
+
+        return $this->sendResponse([], Response::HTTP_OK, config("constants.success.delete_success"));
     }
 
 }
