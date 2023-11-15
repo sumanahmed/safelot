@@ -47,7 +47,7 @@ class VehicleController extends Controller
         if (!$formValidation['isFormValid']) {
             return $this->sendResponse($formValidation['errors'], Response::HTTP_UNPROCESSABLE_ENTITY, 'Validation Error.');
         }
-
+return $this->uploadBase64toPhoto($request->photo_base64, 'vehicle', 300, 200);
         try {
             $requestAll             = $request->all();
             $requestAll['user_id']  = auth()->user()->id;
