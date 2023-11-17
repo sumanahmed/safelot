@@ -117,4 +117,30 @@ class UserController extends Controller
         
         return $this->sendResponse([], Response::HTTP_OK, "Password changed successfully");
     }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Request $request)
+    {   
+        $authUserId = auth()->user()->id;        
+        $user = $this->user->find($authUserId);
+
+        if (!$user) {
+            return $this->sendResponse([], Response::HTTP_NOT_FOUND, config("constants.failed.data_not_found")); 
+        }
+
+        try {
+
+            $user->delete();
+            auth()->user()->tokens()->delete();
+
+        } catch (\Exception $ex) {
+            return $this->sendResponse([], Response::HTTP_UNPROCESSABLE_ENTITY, $ex->getMessage());
+        }
+
+        return $this->sendResponse([], Response::HTTP_OK, config("constants.success.delete_success"));
+    }
 }

@@ -26,8 +26,7 @@ class AuthService {
      */
     public function afterRegisterOtpSend($request) 
     {   
-        try {
-Log::info('acc type = '. $request->account_type);
+        try { 
             if ($request->account_type == 1) {
                 return $this->otpGenerateAndSendToEmail($request); 
             }   
@@ -43,6 +42,11 @@ Log::info('acc type = '. $request->account_type);
     public function emailLogin($request)
     {
         try {
+
+            $accountExist = $this->user->where('email', $request->email)->whereNull('deleted_at')->first();
+            if (!$accountExist) {
+                return $this->sendResponse([], Response::HTTP_NOT_FOUND, "There is no account by this email address"); 
+            }
 
             if(!Auth::attempt(['email' => $request->email, 'password' => $request->password])){
                 return $this->sendResponse([], Response::HTTP_UNAUTHORIZED, config("constants.failed.login"));            

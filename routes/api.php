@@ -35,8 +35,10 @@ Route::group(['middleware' => ['baseToken']], function () {
             Route::get('/show', [UserController::class, 'show'])->name('user.index');
             Route::put('/update', [UserController::class, 'update'])->name('user.update');
             Route::post('/change-password', [UserController::class, 'changePassword'])->name('user.change_password');
+            Route::delete('/destroy', [UserController::class, 'destroy'])->name('user.destroy');
         });
 
+        // dealership routes
         Route::group(['prefix' => 'dealerships'], function () {
             Route::get('/', [DealershipController::class, 'index'])->name('dealership.index');
             Route::post('/store', [DealershipController::class, 'store'])->name('dealership.store');
@@ -47,6 +49,7 @@ Route::group(['middleware' => ['baseToken']], function () {
             Route::post('/fleet-lock-unlock', [DealershipController::class, 'fleetLockUnlock'])->name('dealership.fleet_lock_unlock');
         });
 
+        // vehicle routes
         Route::group(['prefix' => 'vehicles'], function () {
             Route::get('/', [VehicleController::class, 'index'])->name('vehicle.index');
             Route::post('/store', [VehicleController::class, 'store'])->name('vehicle.store');
@@ -55,6 +58,7 @@ Route::group(['middleware' => ['baseToken']], function () {
             Route::delete('/destroy', [VehicleController::class, 'destroy'])->name('vehicle.destroy');
         });
 
+        // device info routes
         Route::group(['prefix' => 'device-info'], function () {
             Route::get('/', [DeviceInfoController::class, 'index'])->name('device_info.index');
             Route::post('/store', [DeviceInfoController::class, 'store'])->name('device_info.store');
