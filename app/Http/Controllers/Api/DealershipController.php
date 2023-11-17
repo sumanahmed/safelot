@@ -191,7 +191,20 @@ class DealershipController extends Controller
         
         try {
             
-            $data = $this->vehicle->select('id','vin','nickname','stock','owner_type')->where('dealership_id', $request->dealership_id)->get();
+            $query = $this->vehicle->with('device:id,vehicle_id,name,model,status')
+                        ->select('id','vin','nickname','stock','owner_type')
+                        ->where('dealership_id', $request->dealership_id)
+                        ->whereNull('deleted_at');
+                        
+            if (request()->vin) {
+                $query = $query->where('vin', request()->vin);
+            }
+    
+            if (request()->model) {
+                $query = $query->where('model', request()->model);
+            }
+                            
+            $data = $query->get();
             
             return $this->sendResponse($data, Response::HTTP_OK, config("constants.success.fetch_success"));
 
