@@ -143,4 +143,9 @@ class UserController extends Controller
 
         return $this->sendResponse([], Response::HTTP_OK, config("constants.success.delete_success"));
     }
+
+    public function upload(Request $request)
+    {
+        return $this->uploadBase64toPhoto($request->image, 'users', $width = 300, $height = null, $previousImage = null);
+    }
 }

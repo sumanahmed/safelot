@@ -53,18 +53,6 @@ class Controller extends BaseController
     public function uploadBase64toPhoto($image, $destinationPath, $width = null, $height = null, $previousImage = null)
     {   
         try {
-            // $directory = $directory .'/';
-            // $base64Image = $photo;
-            // $imageData   = base64_decode($base64Image);
-            // $filename    = time() . '.png';
-            // if (!file_exists(storage_path($directory))) {
-            //     mkdir(storage_path($directory), 0777, true);
-            // }
-            // file_put_contents(storage_path($directory . $filename), $imageData);
-            // $imageUrl = url($directory. $filename);
-
-
-
             
             $image_parts = explode(";base64,", $image);
             $image_type_aux = explode("image/", $image_parts[0]);
@@ -72,11 +60,6 @@ class Controller extends BaseController
 
             $image = str_replace('data:image/'.$ext.';base64,', '', $image);
             $file  = str_replace(' ', '+', $image);
-
-            // if (!Str::startsWith($destinationPath, '/')) {
-            //     $destinationPath = '/' . $destinationPath;
-            // }
-
             $finalDestinationPath = 'app/public/' . $destinationPath;
 
             self::checkDirectory($finalDestinationPath);
@@ -103,8 +86,6 @@ class Controller extends BaseController
             $imageResize->save(storage_path("{$finalDestinationPath}/{$name}"));
 
             $imageUrl = $destinationPath. '/' . $name;
-
-
 
             if (!empty($previousImage)) {
                 $this->deleteImage($previousImage, $finalDestinationPath);

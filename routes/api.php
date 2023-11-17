@@ -36,6 +36,7 @@ Route::group(['middleware' => ['baseToken']], function () {
             Route::put('/update', [UserController::class, 'update'])->name('user.update');
             Route::post('/change-password', [UserController::class, 'changePassword'])->name('user.change_password');
             Route::delete('/destroy', [UserController::class, 'destroy'])->name('user.destroy');
+            Route::post('/upload', [UserController::class, 'upload'])->name('user.upload');
         });
 
         // dealership routes
