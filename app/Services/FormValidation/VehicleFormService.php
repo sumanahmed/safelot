@@ -17,14 +17,11 @@ class VehicleFormService implements IFormValidation
     
     public function rules(): array
     {
-        $user_id = auth()->user()->id;
-
         return [
-            'vin'           => 'required',
+            'vin'           => 'required|unique:vehicles,vin,'. $this->id .',id',
             'owner_type'    => 'required',
             'nickname'      => 'required',
             'stock'         => 'required',
-            'photo_base64'  => 'required',
             'dealership_id' => 'required_if:owner_type,1|nullable',
         ];
     }
@@ -33,10 +30,10 @@ class VehicleFormService implements IFormValidation
     {
         return [            
             'vin.required'          => 'VIN is required',
+            'vin.unique'            => 'VIN is already exist',
             'owner_type.required'   => 'Owner type is required',
             'nickname.required'     => 'Nickname is required',
             'stock.required'        => 'Stock is required',
-            'photo_base64.required' => 'Photo is required',
             'dealership_id.required_if'  => 'Dealership Id is required',
         ];
     }

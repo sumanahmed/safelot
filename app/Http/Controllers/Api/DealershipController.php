@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\{ Request, Response, JsonResponse};
 use App\Services\FormValidation\IFormValidation;
 use App\Http\Traits\ResponseTrait;
-use App\Models\Dealership;
+use App\Models\{ Dealership, Vehicle, DeviceInfo };
 use Illuminate\Support\Facades\Validator;
 use DB;
 
@@ -15,12 +15,16 @@ class DealershipController extends Controller
     use ResponseTrait;
 
     protected $dealership;
+    protected $vehicle;
+    protected $deviceInfo;
     protected $validateForm;
 
-    public function __construct(IFormValidation $validateForm, Dealership $dealership)
+    public function __construct(IFormValidation $validateForm, Dealership $dealership, Vehicle $vehicle, DeviceInfo $deviceInfo)
     {        
         $this->validateForm = $validateForm;
-        $this->dealership = $dealership;
+        $this->dealership   = $dealership;
+        $this->vehicle      = $vehicle;
+        $this->deviceInfo   = $deviceInfo;
     }
 
      /**
@@ -160,6 +164,76 @@ class DealershipController extends Controller
         $data->delete();
 
         return $this->sendResponse([], Response::HTTP_OK, config("constants.success.delete_success"));
+    }
+
+    /**
+     * get the vehicle list by dealership_id.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function vehicleByDealer(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'dealership_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $data = $validator->errors();
+            return $this->sendResponse($data, Response::HTTP_UNPROCESSABLE_ENTITY, 'Validation Error'); 
+        }
+
+        $dealership = $this->dealership->where(['user_id' => auth()->user()->id, 'id' => $request->dealership_id])->first();
+
+        if (!$dealership) {
+            return $this->sendResponse([], Response::HTTP_NOT_FOUND, config("constants.failed.data_not_found")); 
+        }
+        
+        try {
+            
+            $data = $this->vehicle->select('id','vin','nickname','stock','owner_type')->where('dealership_id', $request->dealership_id)->get();
+            
+            return $this->sendResponse($data, Response::HTTP_OK, config("constants.success.fetch_success"));
+
+        } catch (\Exception $ex) {
+            return $this->sendResponse([], Response::HTTP_UNPROCESSABLE_ENTITY, $ex->getMessage()); 
+        }
+    }
+
+    /**
+     * all device lock & unlock by dealership_id.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function fleetLockUnlock(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'dealership_id' => 'required',
+            'status' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $data = $validator->errors();
+            return $this->sendResponse($data, Response::HTTP_UNPROCESSABLE_ENTITY, 'Validation Error'); 
+        }
+
+        $dealership = $this->dealership->where(['user_id' => auth()->user()->id, 'id' => $request->dealership_id])->first();
+
+        if (!$dealership) {
+            return $this->sendResponse([], Response::HTTP_NOT_FOUND, config("constants.failed.data_not_found")); 
+        }
+        
+        try {
+            
+            $vehicleIds = $this->vehicle->where('dealership_id', $request->dealership_id)->pluck('id')->toArray();
+            $this->deviceInfo->whereIn('vehicle_id', $vehicleIds)->update(['status' => $request->status]);
+            
+            return $this->sendResponse([], Response::HTTP_OK, config("constants.success.update_success"));
+
+        } catch (\Exception $ex) {
+            return $this->sendResponse([], Response::HTTP_UNPROCESSABLE_ENTITY, $ex->getMessage()); 
+        }
     }
 
 }

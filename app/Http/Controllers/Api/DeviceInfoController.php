@@ -6,20 +6,24 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\{ Request, Response, JsonResponse};
 use App\Services\FormValidation\IFormValidation;
 use App\Http\Traits\ResponseTrait;
-use App\Models\Vehicle;
+use App\Models\{ Dealership, DeviceInfo, Vehicle };
 use Illuminate\Support\Facades\Validator;
 
-class VehicleController extends Controller
+class DeviceInfoController extends Controller
 {
     use ResponseTrait;
 
+    protected $deviceInfo;
+    protected $dealership;
     protected $vehicle;
     protected $validateForm;
 
-    public function __construct(IFormValidation $validateForm, Vehicle $vehicle)
+    public function __construct(IFormValidation $validateForm, Dealership $dealership, DeviceInfo $deviceInfo, Vehicle $vehicle)
     {        
         $this->validateForm = $validateForm;
-        $this->vehicle = $vehicle;
+        $this->deviceInfo   = $deviceInfo;
+        $this->dealership   = $dealership;
+        $this->vehicle      = $vehicle;
     }
 
      /**
@@ -28,11 +32,14 @@ class VehicleController extends Controller
      * @return JsonResponse
      */
     public function index()
-    {
-        $data = $this->vehicle->with('device:id,vehicle_id,name,model,status')
-                        ->select('id','vin','nickname','stock','owner_type')                    
-                        ->where('user_id', auth()->user()->id)
-                        ->whereNull('deleted_at')->get();
+    {   
+        $data = $this->deviceInfo->with('vehicle:id,user_id,nickname,owner_type')
+                    ->whereHas('vehicle', function($q)  {
+                        return $q->where('user_id', auth()->user()->id);
+                    })
+                    ->select('id','name','model','status','vehicle_id')
+                    ->whereNull('deleted_at')
+                    ->paginate(10);
 
         return $this->sendResponse($data, Response::HTTP_OK, config("constants.success.data_fetches_success"));
     }
@@ -44,19 +51,16 @@ class VehicleController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {   
+    {
         $formValidation = $this->validateForm->validate($request, 0);
         
         if (!$formValidation['isFormValid']) {
             return $this->sendResponse($formValidation['errors'], Response::HTTP_UNPROCESSABLE_ENTITY, 'Validation Error.');
         }
-        
-        try {
-            $requestAll             = $request->all();
-            $requestAll['user_id']  = auth()->user()->id;
-            // $requestAll['photo']    = $this->uploadBase64toPhoto($request->photo_base64, 'vehicle');
 
-            $data = $this->vehicle->create($requestAll);
+        try {
+
+            $data = $this->deviceInfo->create($request->all());
 
             return $this->sendResponse($data, Response::HTTP_CREATED, config("constants.success.save_success"));
 
@@ -82,10 +86,13 @@ class VehicleController extends Controller
             return $this->sendResponse($data, Response::HTTP_UNPROCESSABLE_ENTITY, 'Validation Error'); 
         }
         
-        $data =$this->vehicle->with('device:id,vehicle_id,name,model,status')
-                            ->select('id','vin','nickname','stock','owner_type')
-                            ->where('id', $request->id)
-                            ->first();
+        $data = $this->deviceInfo->with('vehicle:id,user_id,nickname,owner_type')
+                                    ->whereHas('vehicle', function($q)  {
+                                        return $q->where('user_id', auth()->user()->id);
+                                    })
+                                    ->select('id','name','model','status','vehicle_id')
+                                    ->where('id', $request->id)
+                                    ->first();
 
         if (!$data) {
             return $this->sendResponse([], Response::HTTP_NOT_FOUND, config("constants.failed.data_not_found")); 
@@ -109,17 +116,17 @@ class VehicleController extends Controller
             return $this->sendResponse($formValidation['errors'], Response::HTTP_UNPROCESSABLE_ENTITY, 'Validation Error.');
         }
 
-        $vehicle = $this->vehicle->find($request->id);
+        $deviceInfo = $this->dealership->find($request->id);
 
-        if (!$vehicle) {
+        if (!$deviceInfo) {
             return $this->sendResponse([], Response::HTTP_NOT_FOUND, config("constants.failed.data_not_found")); 
         }
 
         try {
 
-            $vehicle->update($request->all());
+            $deviceInfo->update($request->all());
 
-            $data = $this->vehicle->find($request->id);
+            $data = $this->deviceInfo->find($request->id);
 
             return $this->sendResponse($data, Response::HTTP_CREATED, config("constants.success.update_success"));
 
@@ -145,7 +152,7 @@ class VehicleController extends Controller
             return $this->sendResponse($data, Response::HTTP_UNPROCESSABLE_ENTITY, 'Validation Error'); 
         }
         
-        $data = $this->vehicle->find($request->id);
+        $data = $this->deviceInfo->find($request->id);
 
         if (!$data) {
             return $this->sendResponse([], Response::HTTP_NOT_FOUND, config("constants.failed.data_not_found")); 
@@ -156,4 +163,31 @@ class VehicleController extends Controller
         return $this->sendResponse([], Response::HTTP_OK, config("constants.success.delete_success"));
     }
 
+    /**
+     * device lock unlock
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function lockUnlock(Request $request)
+    {   
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $data = $validator->errors();
+            return $this->sendResponse($data, Response::HTTP_UNPROCESSABLE_ENTITY, 'Validation Error'); 
+        }
+        
+        $deviceInfo = $this->deviceInfo->find($request->id);
+
+        if (!$deviceInfo) {
+            return $this->sendResponse([], Response::HTTP_NOT_FOUND, config("constants.failed.data_not_found")); 
+        }
+
+        $deviceInfo->status = $deviceInfo->status == 1 ? 2 : 1;
+        $deviceInfo->update();        
+
+        return $this->sendResponse($deviceInfo, Response::HTTP_CREATED, config("constants.success.update_success"));
+    }
 }

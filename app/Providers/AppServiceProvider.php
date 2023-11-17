@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Services\FormValidation\{ 
     DealershipFormService,
+    DeviceInfoFormService,
     IFormValidation,
     LoginFormService,
     RegistrationFormService,
@@ -49,6 +50,8 @@ class AppServiceProvider extends ServiceProvider
                     return new DealershipFormService();
                 case 'VehicleController':
                     return new VehicleFormService();
+                case 'DeviceInfoController':
+                    return new DeviceInfoFormService();
                 default:
                    return '';
             }

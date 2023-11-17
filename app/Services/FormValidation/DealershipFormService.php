@@ -37,7 +37,7 @@ class DealershipFormService implements IFormValidation
     {
         return [            
             'name.required' => 'Dealership name is required',
-            'name.unique'   => 'This Dealership already exist for this dealer',
+            'name.unique'   => 'Dealership already exist for this dealer',
             'address_1'     => 'Address is required',
             'city_1'        => 'City is required',
             'state_1'       => 'State is required',

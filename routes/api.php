@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\{ AuthController, DealershipController, ForgotPasswordController, UserController, VehicleController};
+use App\Http\Controllers\Api\{ AuthController, DealershipController, DeviceInfoController, ForgotPasswordController, UserController, VehicleController};
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +33,7 @@ Route::group(['middleware' => ['baseToken']], function () {
         Route::group(['prefix' => 'users'], function () {
             Route::get('/', [UserController::class, 'index'])->name('user.index');
             Route::get('/show', [UserController::class, 'show'])->name('user.index');
+            Route::put('/update', [UserController::class, 'update'])->name('user.update');
             Route::post('/change-password', [UserController::class, 'changePassword'])->name('user.change_password');
         });
 
@@ -42,6 +43,8 @@ Route::group(['middleware' => ['baseToken']], function () {
             Route::get('/show', [DealershipController::class, 'show'])->name('dealership.show');
             Route::put('/update', [DealershipController::class, 'update'])->name('dealership.update');
             Route::delete('/destroy', [DealershipController::class, 'destroy'])->name('dealership.destroy');
+            Route::get('/vehicle', [DealershipController::class, 'vehicleByDealer'])->name('dealership.vehicle_by_dealership');
+            Route::post('/fleet-lock-unlock', [DealershipController::class, 'fleetLockUnlock'])->name('dealership.fleet_lock_unlock');
         });
 
         Route::group(['prefix' => 'vehicles'], function () {
@@ -50,6 +53,15 @@ Route::group(['middleware' => ['baseToken']], function () {
             Route::get('/show', [VehicleController::class, 'show'])->name('vehicle.show');
             Route::put('/update', [VehicleController::class, 'update'])->name('vehicle.update');
             Route::delete('/destroy', [VehicleController::class, 'destroy'])->name('vehicle.destroy');
+        });
+
+        Route::group(['prefix' => 'device-info'], function () {
+            Route::get('/', [DeviceInfoController::class, 'index'])->name('device_info.index');
+            Route::post('/store', [DeviceInfoController::class, 'store'])->name('device_info.store');
+            Route::get('/show', [DeviceInfoController::class, 'show'])->name('device_info.show');
+            Route::put('/update', [DeviceInfoController::class, 'update'])->name('device_info.update');
+            Route::delete('/destroy', [DeviceInfoController::class, 'destroy'])->name('device_info.destroy');
+            Route::put('/lock-unlock', [DeviceInfoController::class, 'lockUnlock'])->name('device_info.lock_unlock');
         });
 
         Route::post('logout', [AuthController::class, 'logout'])->name('auth.logout');

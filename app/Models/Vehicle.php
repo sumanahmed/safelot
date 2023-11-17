@@ -3,11 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\{ Model, SoftDeletes };
 
 class Vehicle extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     
     protected $guarded = ['id','created_at','updated_at'];
 
@@ -16,8 +16,8 @@ class Vehicle extends Model
         return $this->belongsTo(Dealership::class);
     }
 
-    public function devices()
+    public function device()
     {
-        return $this->hasMany(DeviceInfo::class);
+        return $this->hasOne(DeviceInfo::class);
     }
 }

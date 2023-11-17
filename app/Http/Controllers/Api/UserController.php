@@ -46,6 +46,45 @@ class UserController extends Controller
     }
 
     /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Item  $item
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'first_name'=> 'required',
+            'last_name' => 'nullable',
+            'email'     => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $data = $validator->errors();
+            return $this->sendResponse($data, Response::HTTP_UNPROCESSABLE_ENTITY, 'Validation Error'); 
+        }
+
+        $user = $this->user->find($request->id);
+
+        if (!$user) {
+            return $this->sendResponse([], Response::HTTP_NOT_FOUND, config("constants.failed.data_not_found")); 
+        }
+
+        try {
+
+            $user->update($request->all());
+
+            $data = $this->user->find($request->id);
+
+            return $this->sendResponse($data, Response::HTTP_CREATED, config("constants.success.update_success"));
+
+        } catch (\Exception $ex) {
+            return $this->sendResponse([], Response::HTTP_UNPROCESSABLE_ENTITY, $ex->getMessage()); 
+        }
+    }
+
+    /**
      * Change the password for the authenticated user.
      *
      * @param Request $request
