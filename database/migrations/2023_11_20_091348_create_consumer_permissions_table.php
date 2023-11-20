@@ -11,21 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('dealerships', function (Blueprint $table) {
+        Schema::create('consumer_permissions', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->string('name', 100);
-            $table->string('address_1');
-            $table->string('city_1');
-            $table->string('state_1');
-            $table->string('zip_1');
-            $table->string('address_2')->nullable();
-            $table->string('city_2')->nullable();
-            $table->string('state_2')->nullable();
-            $table->string('zip_2')->nullable();
-            $table->softDeletes();
+            $table->unsignedBigInteger('permission_id');
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('permission_id')->references('id')->on('permissions');
         });
     }
 
@@ -34,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('dealerships');
+        Schema::dropIfExists('consumer_permissions');
     }
 };

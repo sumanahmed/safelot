@@ -7,6 +7,7 @@ use App\Services\FormValidation\{
     DeviceInfoFormService,
     IFormValidation,
     LoginFormService,
+    PermissionFormService,
     RegistrationFormService,
     UserFormService,
     VehicleFormService
@@ -52,6 +53,8 @@ class AppServiceProvider extends ServiceProvider
                     return new VehicleFormService();
                 case 'DeviceInfoController':
                     return new DeviceInfoFormService();
+                case 'PermissionController':
+                    return new PermissionFormService();
                 default:
                    return '';
             }

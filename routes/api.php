@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\{ AuthController, DealershipController, DeviceInfoController, ForgotPasswordController, UserController, VehicleController};
+use App\Http\Controllers\Api\{ AuthController, DealershipController, DeviceInfoController, ForgotPasswordController, PermissionController, UserController, VehicleController};
 
 /*
 |--------------------------------------------------------------------------
@@ -67,6 +67,15 @@ Route::group(['middleware' => ['baseToken']], function () {
             Route::put('/update', [DeviceInfoController::class, 'update'])->name('device_info.update');
             Route::delete('/destroy', [DeviceInfoController::class, 'destroy'])->name('device_info.destroy');
             Route::put('/lock-unlock', [DeviceInfoController::class, 'lockUnlock'])->name('device_info.lock_unlock');
+        });
+
+        // permission routes
+        Route::group(['prefix' => 'permissions'], function () {
+            Route::get('/', [PermissionController::class, 'index'])->name('permission.index');
+            Route::post('/store', [PermissionController::class, 'store'])->name('permission.store');
+            Route::get('/show', [PermissionController::class, 'show'])->name('permission.show');
+            Route::put('/update', [PermissionController::class, 'update'])->name('permission.update');
+            Route::delete('/destroy', [PermissionController::class, 'destroy'])->name('permission.destroy');
         });
 
         Route::post('logout', [AuthController::class, 'logout'])->name('auth.logout');

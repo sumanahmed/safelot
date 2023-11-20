@@ -25,13 +25,11 @@ return new class extends Migration
             $table->unsignedTinyInteger('otp_verified')->comment('1=Yes,2=No')->default(2);
             $table->string('photo')->nullable();
             $table->string('photo_base64')->nullable();
-            $table->unsignedBigInteger('dealer_id')->nullable()->comment('for consumer');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
             $table->rememberToken();
             $table->softDeletes();
             $table->timestamps();
-            $table->foreign('dealer_id')->on('users')->references('id');
         });
     }
 
